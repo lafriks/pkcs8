@@ -16,22 +16,22 @@ var (
 
 func init() {
 	RegisterCipher(oidAES128CBC, func() Cipher {
-		return AES128CBC
+		return &AES128CBC
 	})
 	RegisterCipher(oidAES128GCM, func() Cipher {
-		return AES128GCM
+		return &AES128GCM
 	})
 	RegisterCipher(oidAES192CBC, func() Cipher {
-		return AES192CBC
+		return &AES192CBC
 	})
 	RegisterCipher(oidAES192GCM, func() Cipher {
-		return AES192GCM
+		return &AES192GCM
 	})
 	RegisterCipher(oidAES256CBC, func() Cipher {
-		return AES256CBC
+		return &AES256CBC
 	})
 	RegisterCipher(oidAES256GCM, func() Cipher {
-		return AES256GCM
+		return &AES256GCM
 	})
 }
 

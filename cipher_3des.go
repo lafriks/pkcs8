@@ -9,7 +9,7 @@ var oidDESEDE3CBC = asn1.ObjectIdentifier{1, 2, 840, 113549, 3, 7}
 
 func init() {
 	RegisterCipher(oidDESEDE3CBC, func() Cipher {
-		return TripleDESCBC
+		return &TripleDESCBC
 	})
 }
 

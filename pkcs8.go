@@ -29,7 +29,7 @@ var DefaultOpts = &Opts{
 type KDFOpts interface {
 	// DeriveKey derives a key of size bytes from the given password and salt.
 	// It returns the key and the ASN.1-encodable parameters used.
-	DeriveKey(password, salt []byte, size int) (key []byte, params KDFParameters, err error)
+	DeriveKey(password, salt []byte, size int) ([]byte, KDFParameters, error)
 	// GetSaltSize returns the salt size specified.
 	GetSaltSize() int
 	// OID returns the OID of the KDF specified.
@@ -42,7 +42,7 @@ type KDFOpts interface {
 type KDFParameters interface {
 	// DeriveKey derives a key of size bytes from the given password.
 	// It uses the salt from the decoded parameters.
-	DeriveKey(password []byte, size int) (key []byte, err error)
+	DeriveKey(password []byte, size int) ([]byte, error)
 }
 
 var kdfs = make(map[string]func() KDFParameters)
@@ -173,7 +173,7 @@ func ParsePrivateKey(der []byte, password []byte) (interface{}, KDFParameters, e
 
 	key, err := x509.ParsePKCS8PrivateKey(decryptedKey)
 	if err != nil {
-		return nil, nil, errors.New("pkcs8: incorrect password")
+		return nil, nil, x509.IncorrectPasswordError
 	}
 	return key, kdfParams, nil
 }
