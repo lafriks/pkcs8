@@ -1,7 +1,7 @@
 # pkcs8
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/lafriks/pkcs8)](https://pkg.go.dev/github.com/lafriks/pkcs8)
-[![Test](https://github.com/lafriks/pkcs8/actions/workflows/go.yml/badge.svg?branch=main&event=push)](https://github.com/lafriks/pkcs8/actions/workflows/go.yml)
+[![Test](https://github.com/lafriks/pkcs8/actions/workflows/go.yaml/badge.svg)](https://github.com/lafriks/pkcs8/actions/workflows/go.yaml)
 
 OpenSSL can generate private keys in both "traditional format" and PKCS#8 format. Newer applications are advised to use more secure PKCS#8 format. Go standard crypto package provides a [function](http://golang.org/pkg/crypto/x509/#ParsePKCS8PrivateKey) to parse private key in PKCS#8 format. There is a limitation to this function. It can only handle unencrypted PKCS#8 private keys. To use this function, the user has to save the private key in file without encryption, which is a bad practice to leave private keys unprotected on file systems. In addition, Go standard package lacks the functions to convert RSA/ECDSA private keys into PKCS#8 format.
 
