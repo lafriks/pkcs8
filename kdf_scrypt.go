@@ -6,9 +6,7 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-var (
-	oidScrypt = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 11591, 4, 11}
-)
+var oidScrypt = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 11591, 4, 11}
 
 func init() {
 	RegisterKDF(oidScrypt, func() KDFParameters {
@@ -23,7 +21,7 @@ type scryptParams struct {
 	ParallelizationParameter int
 }
 
-func (p scryptParams) DeriveKey(password []byte, size int) (key []byte, err error) {
+func (p scryptParams) DeriveKey(password []byte, size int) ([]byte, error) {
 	return scrypt.Key(password, p.Salt, p.CostParameter, p.BlockSize,
 		p.ParallelizationParameter, size)
 }
@@ -36,15 +34,16 @@ type ScryptOpts struct {
 	ParallelizationParameter int
 }
 
-func (p ScryptOpts) DeriveKey(password, salt []byte, size int) (
-	key []byte, params KDFParameters, err error) {
-
-	key, err = scrypt.Key(password, salt, p.CostParameter, p.BlockSize,
-		p.ParallelizationParameter, size)
+// DeriveKey derives a key of size bytes from the given password and salt.
+func (p ScryptOpts) DeriveKey(password, salt []byte, keyLen int) (
+	[]byte, KDFParameters, error,
+) {
+	key, err := scrypt.Key(password, salt, p.CostParameter, p.BlockSize,
+		p.ParallelizationParameter, keyLen)
 	if err != nil {
 		return nil, nil, err
 	}
-	params = scryptParams{
+	params := scryptParams{
 		BlockSize:                p.BlockSize,
 		CostParameter:            p.CostParameter,
 		ParallelizationParameter: p.ParallelizationParameter,
@@ -53,10 +52,12 @@ func (p ScryptOpts) DeriveKey(password, salt []byte, size int) (
 	return key, params, nil
 }
 
+// GetSaltSize returns the salt size.
 func (p ScryptOpts) GetSaltSize() int {
 	return p.SaltSize
 }
 
+// OID returns the OID of scrypt.
 func (p ScryptOpts) OID() asn1.ObjectIdentifier {
 	return oidScrypt
 }

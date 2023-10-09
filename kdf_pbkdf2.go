@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	oidPKCS5PBKDF2        = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 5, 12}
-	oidHMACWithSHA1       = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 7}
-	oidHMACWithSHA256     = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 9}
+	oidPKCS5PBKDF2    = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 5, 12}
+	oidHMACWithSHA1   = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 7}
+	oidHMACWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 113549, 2, 9}
 )
 
 func init() {
@@ -40,11 +40,13 @@ func newPRFParamFromHash(h crypto.Hash) (pkix.AlgorithmIdentifier, error) {
 	case crypto.SHA1:
 		return pkix.AlgorithmIdentifier{
 			Algorithm:  oidHMACWithSHA1,
-			Parameters: asn1.RawValue{Tag: asn1.TagNull}}, nil
+			Parameters: asn1.RawValue{Tag: asn1.TagNull},
+		}, nil
 	case crypto.SHA256:
 		return pkix.AlgorithmIdentifier{
 			Algorithm:  oidHMACWithSHA256,
-			Parameters: asn1.RawValue{Tag: asn1.TagNull}}, nil
+			Parameters: asn1.RawValue{Tag: asn1.TagNull},
+		}, nil
 	}
 	return pkix.AlgorithmIdentifier{}, errors.New("pkcs8: unsupported hash function")
 }
@@ -55,7 +57,7 @@ type pbkdf2Params struct {
 	PRF            pkix.AlgorithmIdentifier `asn1:"optional"`
 }
 
-func (p pbkdf2Params) DeriveKey(password []byte, size int) (key []byte, err error) {
+func (p pbkdf2Params) DeriveKey(password []byte, size int) ([]byte, error) {
 	h, err := newHashFromPRF(p.PRF)
 	if err != nil {
 		return nil, err
@@ -70,22 +72,25 @@ type PBKDF2Opts struct {
 	HMACHash       crypto.Hash
 }
 
-func (p PBKDF2Opts) DeriveKey(password, salt []byte, size int) (
-	key []byte, params KDFParameters, err error) {
-
-	key = pbkdf2.Key(password, salt, p.IterationCount, size, p.HMACHash.New)
+// DeriveKey derives a key of size bytes from the given password and salt.
+func (p PBKDF2Opts) DeriveKey(password, salt []byte, keyLen int) (
+	[]byte, KDFParameters, error,
+) {
+	key := pbkdf2.Key(password, salt, p.IterationCount, keyLen, p.HMACHash.New)
 	prfParam, err := newPRFParamFromHash(p.HMACHash)
 	if err != nil {
 		return nil, nil, err
 	}
-	params = pbkdf2Params{salt, p.IterationCount, prfParam}
+	params := pbkdf2Params{salt, p.IterationCount, prfParam}
 	return key, params, nil
 }
 
+// GetSaltSize returns the salt size.
 func (p PBKDF2Opts) GetSaltSize() int {
 	return p.SaltSize
 }
 
+// OID returns the OID of PBKDF2.
 func (p PBKDF2Opts) OID() asn1.ObjectIdentifier {
 	return oidPKCS5PBKDF2
 }

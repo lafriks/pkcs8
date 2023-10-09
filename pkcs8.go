@@ -96,12 +96,6 @@ type pbes2Params struct {
 	EncryptionScheme  pkix.AlgorithmIdentifier
 }
 
-type privateKeyInfo struct {
-	Version             int
-	PrivateKeyAlgorithm pkix.AlgorithmIdentifier
-	PrivateKey          []byte
-}
-
 func parseKeyDerivationFunc(keyDerivationFunc pkix.AlgorithmIdentifier) (KDFParameters, error) {
 	oid := keyDerivationFunc.Algorithm.String()
 	newParams, ok := kdfs[oid]
