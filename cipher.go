@@ -30,7 +30,7 @@ func (c cipherWithBlock) Encrypt(key, iv, plaintext []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cbcEncrypt(block, key, iv, plaintext)
+	return cbcEncrypt(block, iv, plaintext)
 }
 
 func (c cipherWithBlock) Decrypt(key, iv, ciphertext []byte) ([]byte, error) {
@@ -38,10 +38,10 @@ func (c cipherWithBlock) Decrypt(key, iv, ciphertext []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cbcDecrypt(block, key, iv, ciphertext)
+	return cbcDecrypt(block, iv, ciphertext)
 }
 
-func cbcEncrypt(block cipher.Block, key, iv, plaintext []byte) ([]byte, error) {
+func cbcEncrypt(block cipher.Block, iv, plaintext []byte) ([]byte, error) {
 	mode := cipher.NewCBCEncrypter(block, iv)
 	paddingLen := block.BlockSize() - (len(plaintext) % block.BlockSize())
 	ciphertext := make([]byte, len(plaintext)+paddingLen)
@@ -51,7 +51,7 @@ func cbcEncrypt(block cipher.Block, key, iv, plaintext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func cbcDecrypt(block cipher.Block, key, iv, ciphertext []byte) ([]byte, error) {
+func cbcDecrypt(block cipher.Block, iv, ciphertext []byte) ([]byte, error) {
 	mode := cipher.NewCBCDecrypter(block, iv)
 	plaintext := make([]byte, len(ciphertext))
 	mode.CryptBlocks(plaintext, ciphertext)
