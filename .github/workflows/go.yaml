@@ -2,27 +2,31 @@ name: Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go-version: ["1.25", "1.26"]
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: 1.22
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
 
-    - name: Lint
-      run: |
-        go vet -all .
-        go install github.com/mgechev/revive@latest
-        revive -config .revive.toml ./...
+      - name: Lint
+        run: |
+          go vet -all .
+          go install github.com/mgechev/revive@latest
+          revive -config .revive.toml ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v ./...

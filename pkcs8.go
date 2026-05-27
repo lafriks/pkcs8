@@ -127,7 +127,7 @@ func parseEncryptionScheme(encryptionScheme pkix.AlgorithmIdentifier) (Cipher, [
 // ParsePrivateKey parses a DER-encoded PKCS#8 private key.
 // Password can be nil.
 // This is equivalent to ParsePKCS8PrivateKey.
-func ParsePrivateKey(der []byte, password []byte) (interface{}, KDFParameters, error) {
+func ParsePrivateKey(der []byte, password []byte) (any, KDFParameters, error) {
 	// No password provided, assume the private key is unencrypted
 	if len(password) == 0 {
 		privateKey, err := x509.ParsePKCS8PrivateKey(der)
@@ -180,7 +180,7 @@ func ParsePrivateKey(der []byte, password []byte) (interface{}, KDFParameters, e
 
 // MarshalPrivateKey encodes a private key into DER-encoded PKCS#8 with the given options.
 // Password can be nil.
-func MarshalPrivateKey(priv interface{}, password []byte, opts *Opts) ([]byte, error) {
+func MarshalPrivateKey(priv any, password []byte, opts *Opts) ([]byte, error) {
 	if len(password) == 0 {
 		return x509.MarshalPKCS8PrivateKey(priv)
 	}
@@ -255,7 +255,7 @@ func MarshalPrivateKey(priv interface{}, password []byte, opts *Opts) ([]byte, e
 }
 
 // ParsePKCS8PrivateKey parses encrypted/unencrypted private keys in PKCS#8 format. To parse encrypted private keys, a password of []byte type should be provided to the function as the second parameter.
-func ParsePKCS8PrivateKey(der []byte, v ...[]byte) (interface{}, error) {
+func ParsePKCS8PrivateKey(der []byte, v ...[]byte) (any, error) {
 	var password []byte
 	if len(v) > 0 {
 		password = v[0]
@@ -294,7 +294,7 @@ func ParsePKCS8PrivateKeyECDSA(der []byte, v ...[]byte) (*ecdsa.PrivateKey, erro
 // To encrypt the private key, the password of []byte type should be provided as the second parameter.
 //
 // The only supported key types are RSA and ECDSA (*rsa.PrivateKey or *ecdsa.PrivateKey for priv)
-func ConvertPrivateKeyToPKCS8(priv interface{}, v ...[]byte) ([]byte, error) {
+func ConvertPrivateKeyToPKCS8(priv any, v ...[]byte) ([]byte, error) {
 	var password []byte
 	if len(v) > 0 {
 		password = v[0]
